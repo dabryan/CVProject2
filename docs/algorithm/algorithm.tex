@@ -1,0 +1,53 @@
+
+%This is the hello world document, it is very usefull
+%As you can see the character % is used for comments
+
+\documentclass[a4paper,12pt]{article}
+%\documentclass[doc]{apa}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{amsmath}
+%\setlength\parindent{0pt}
+%\usepackage{figure}
+%\usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+	
+\begin{itemize}
+    \item Normalize image points
+        \begin{itemize}
+            \item \textbf{Centroid is at the origin}. We create the matrix $T_{trans}$ for each
+                camera like this:
+                \begin{equation}
+                    \left [
+                    \begin{array}[ ]{c c c}
+                        1 & 0 & -\mu_x\\
+                        0 & 1 & -\mu_y\\
+                        0 & 0 & 1\\
+                    \end{array}
+                \right ]
+                \end{equation}
+                And we multiply each point of the cameras to they corresponding $T$ matrix like this:
+                $Tx_i$.
+            \item \textbf{RMS distance from the origin is $\sqrt{2}$.} First compute the RMS of the
+                available points:
+                \begin{equation}
+                    \sqrt{ \frac{1}{n} \sum_{i=1}^n \left(  (x_i - \mu_x)^2 + (y_i- \mu_y)^2) \right) }
+                \end{equation}
+                Then create $T_{scale}$ and multiply it to each point in the camera. T is:
+                \begin{equation}
+                    T_s = \left[ 
+                    \begin{array}[]{ccc}
+                        \sqrt{2}/RMS & 0 & 0 \\
+                        0 & \sqrt{2}/RMS  & 0 \\
+                        0 & 0 & 1 
+                    \end{array}
+                     \right]
+                \end{equation}
+        \end{itemize}
+    \item \textbf{Multiply each point by $T_n = T_sT_t$ like this $[u v 1]' = T_nx$. Do it for each camera.}
+    \item 
+\end{itemize}
+\end{document}
