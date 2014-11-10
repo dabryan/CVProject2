@@ -47,7 +47,24 @@
                      \right]
                 \end{equation}
         \end{itemize}
-    \item \textbf{Multiply each point by $T_n = T_sT_t$ like this $[u v 1]' = T_nx$. Do it for each camera.}
-    \item 
-\end{itemize}
+    \item \textbf{Multiply each point by $T_n = T_sT_t$ like this $[u~ v~ 1]' = T_nx$. Do it for each camera.}
+    \item \textbf{Solve $x'_nFx_n = 0$ }. To do this we need to form the system $Af = 0$ and solve for f.
+        The matrix A is: \begin{equation}
+            A = \left[ 
+            \begin{array}[ ]{ccccccccc}
+                u'_1u_1 & u'_1v_1 & u'_1 & v'_1u_1 &v'_1v_1 & v'_1 & u_1 & v_1 & 1 \\
+                u'_2u_2 & u'_2v_2 & u'_2 & v'_2u_2 &v'_2v_2 & v'_2 & u_2 & v_2 & 1 \\
+                u'_3u_3 & u'_3v_3 & u'_3 & v'_3u_3 &v'_3v_3 & v'_3 & u_3 & v_3 & 1 \\
+                &&& \vdots \\
+                u'_nu_n & u'_nv_n & u'_n & v'_nu_n &v'_nv_n & v'_n & u_n & v_n & 1 
+            \end{array}
+            \right] F = 0
+        \end{equation}
+    \item \textbf{Find least square solution of $Af = 0$}. 
+        \begin{itemize}
+            \item First find SVD of A $USV = A$. 
+            \item Choose f to be the last column of V
+        \end{itemize}
+    \end{itemize}
+        
 \end{document}
