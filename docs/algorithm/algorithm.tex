@@ -63,8 +63,26 @@
     \item \textbf{Find least square solution of $Af = 0$}. 
         \begin{itemize}
             \item First find SVD of A $USV = A$. 
-            \item Choose f to be the last column of V
+            \item Choose $F_{Norm}$ to be the last column of V
         \end{itemize}
+    \item \textbf{Enforcing Singularity} 
+        \begin{itemize}
+            \item For $F_{Norm}=USV^T$ 
+            \item Set $S_3$=0 for 
+            \begin{equation}
+                       F_{norm} =U \left[ 
+            \begin{array}[]{ccc}
+                        S_1 & 0 & 0 \\
+                        0 & S_2  & 0 \\
+                        0 & 0 & S_3 
+                    \end{array}
+            \right] V^T
+            \end{equation}
+        \end{itemize}
+    \item \textbf{Denormalisation}
+    	\begin{equation}
+    	F=T_{NormLeft}*F_{Norm}*T_{NormRight}
+    	\end{equation}
     \end{itemize}
         
 \end{document}
