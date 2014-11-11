@@ -6,12 +6,12 @@ addpath(genpath('variables'));
 
 
 
-% % Running in parallel, check if the pool of threads is already open
-% if matlabpool('size') == 0 
-%     infoLocal = parcluster('local');
-%     maxWorkers = infoLocal.NumWorkers;
-%     matlabpool('open',maxWorkers);
-% end
+% Running in parallel, check if the pool of threads is already open
+if matlabpool('size') == 0 
+    infoLocal = parcluster('local');
+    maxWorkers = infoLocal.NumWorkers;
+    matlabpool('open',maxWorkers);
+end
 
 %% Intrinsic camera parameters for Kinect camera
 cameraModel=[-525 0 320;0 -525 240;0 0 1]; 
@@ -66,16 +66,16 @@ T_sr = [sqrt(2)/RMS_r   0               0
         0               0               1];
 
 % Tnorm
-T_nl = T_sl*T_tl;
-T_nr = T_sr*T_tr;
+T_nl = T_sl*T_tl
+T_nr = T_sr*T_tr
 
 % Adding extra column to make the multiplication
 x_l(:,3) = 1;
 x_r(:,3) = 1;
 
 % Normalizing points 
-uvl = T_nl*x_l';
-uvr = T_nr*x_r';
+uvl = T_nl*x_l'
+uvr = T_nr*x_r'
 
 % Build matrix A
 A = zeros(length(x_l),9); 
@@ -92,7 +92,7 @@ F_n = reshape(VT(:,end),[3,3])';
 S(9)=0;
 F_n = U*S*VT';
 % Denormalisation
-F = T_nr'*F_n*T_nl;
+F = T_nl'*F_n*T_nr;
 
 return;
 
