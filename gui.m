@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 03-Nov-2014 12:40:41
+% Last Modified by GUIDE v2.5 11-Nov-2014 10:27:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,18 +53,19 @@ function gui_OpeningFcn(hObject, eventdata, handles, varargin)
     % varargin   command line arguments to gui (see VARARGIN)
     addpath(genpath('externalLib'));
     addpath(genpath('variables'));
-
-
-    % Running in parallel, check if the pool of threads is already open
-    if matlabpool('size') == 0 
-        infoLocal = parcluster('local');
-        maxWorkers = infoLocal.NumWorkers;
-        matlabpool('open',maxWorkers);
-    end
-
-    %% Intrinsic camera parameters for Kinect camera
-    cameraModel=[-525 0 320;0 -525 240;0 0 1]; 
+    
     totalImages = 10;
+    handles.figure_width = 100;
+    handles.figure_heigth = 40;
+    handles.w_extra_heigth = 2.5;
+
+    % Indicates the color used to display the corresponding colors
+    handles.colors = ['r' 'g' 'b' 'k' 'y' 'm' 'c' 'w']
+    handles.tot_left = 0; % How many points have been selected on the left image
+    handles.tot_right = 0; % How many points have been selected on the right image
+
+    handles.left_points = [];
+    handles.right_points = [];
 
     %% Read images and depth data (480 x 640 x channels(5) x totalImages(20))
     % images(:,:,1:3,i) RGB channels for image i
@@ -74,14 +75,19 @@ function gui_OpeningFcn(hObject, eventdata, handles, varargin)
     images=readImages(totalImages,'kinect');
     %figure = axes1
     handles.all_images = images;
-    handles.left_image = 1;
-    handles.righ_Image= 8;
+    handles.left_image_idx = 1;
+    handles.right_image_idx= 8;
 
+    handles.left_image = handles.all_images(:,:,1:3,handles.left_image_idx);
+    handles.right_Image = handles.all_images(:,:,1:3,handles.right_image_idx);;
+
+    handles.img_width = size(handles.left_image,2)
+    handles.img_heigth = size(handles.left_image,1)
 
     axes(handles.axes1);
-    imshow(uint8(handles.all_images(:,:,1:3,handles.left_image)));
+    imshow(uint8(handles.left_image));
     axes(handles.axes2);
-    imshow(uint8(handles.all_images(:,:,1:3,handles.righ_Image)));
+    imshow(uint8(handles.right_Image));
 
     handles.output = hObject;
 
@@ -99,49 +105,81 @@ function varargout = gui_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-% --- Executes on button press in pushbutton2.
-function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
+% --- Executes on mouse press over figure background, over a disabled or
+% --- inactive control, or over an axes background.
+function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    pos=get(hObject,'CurrentPoint');
+    disp(['You clicked X:',num2str(pos(1)),', Y:',num2str(pos(2))]);
+    xwin = pos(1);
+    ywin = pos(2);
+    
+    % Verify that we are clicking inside some of the two windows
+    if( ywin > handles.w_extra_heigth &  ...
+        ywin < handles.figure_heigth)
+        if( xwin < handles.figure_width)
+            x = (pos(1)/handles.figure_width)*handles.img_width;
+            y = handles.img_heigth-...
+                ( (pos(2)-handles.w_extra_heigth)/(handles.figure_heigth-2*handles.w_extra_heigth))*handles.img_heigth;
+
+            disp(['Figure 1 X:',num2str(x),', Y:',num2str(y)]);
+            axes(handles.axes1);
+            hold on;
+            plot(x,y, strcat( handles.colors(1+mod(handles.tot_left, length(handles.colors))), '*'));
+            handles.tot_left = handles.tot_left + 1;
+
+            handles.left_points(handles.tot_left,1)  = x;
+            handles.left_points(handles.tot_left,2)  = y;
+        else
+            x = ( (pos(1)-handles.figure_width)/handles.figure_width)*handles.img_width;
+            y = handles.img_heigth-...
+                ( (pos(2)-handles.w_extra_heigth)/(handles.figure_heigth-2*handles.w_extra_heigth))*handles.img_heigth;
+
+            disp(['Figure 2 X:',num2str(x),', Y:',num2str(y)]);
+            axes(handles.axes2);
+            hold on;
+            plot(x,y, strcat( handles.colors(1+mod(handles.tot_right, length(handles.colors))), '*'));
+            handles.tot_right = handles.tot_right + 1;
+
+            handles.right_points(handles.tot_right,1)  = x;
+            handles.right_points(handles.tot_right,2)  = y;
+        end
+        guidata(hObject, handles);
+    end
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over pushbutton3.
+function pushbutton3_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-% --- Executes on mouse press over axes background.
-function axes1_ButtonDownFcn(hObject, eventdata, handles)
-    x = 10;
-    display('button clicked');
-    nObject
-% hObject    handle to axes1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on mouse press over figure background.
-function figure1_ButtonDownFcn(hObject, eventdata, handles)   
-% hObject    handle to figure1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    display('here');
-
-
-% --- Executes on mouse press over axes background.
-function axes2_ButtonDownFcn(hObject, eventdata, handles)
-    display('axes2');
-% hObject    handle to axes2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+    % hObject    handle to pushbutton3 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    if( handles.tot_left == handles.tot_right )
+        if(handles.tot_left < 8)
+            disp('You need at least 8 points in each image');
+            disp(strcat('You currently have selected only: ', num2str(handles.tot_left)));
+        else
+            x_l = handles.left_points;
+            x_r = handles.right_points;
+            save('Points.mat','x_l','x_r');
+        end
+    else
+        disp('There are not the same number of points seleced for the right and left image! ' );
+        disp('Plase choose the same number of points to continue');
+        disp(strcat('Number of left pts: ', num2str(handles.tot_left)));
+        disp(strcat('Number of right pts: ', num2str(handles.tot_right)));
+    end

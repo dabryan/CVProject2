@@ -16,6 +16,8 @@ end
 %% Intrinsic camera parameters for Kinect camera
 cameraModel=[-525 0 320;0 -525 240;0 0 1]; 
 
+load('Points.mat','x_l','x_r');
+
 %% Using points given by proffesor for testing (12)
 x_l = [
     434.00 360
