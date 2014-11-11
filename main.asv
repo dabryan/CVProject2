@@ -85,19 +85,25 @@ for i=1:length(x_l)
 end
 
 % Compute SVD of A
-[U,S,VT] = svd(A);
+[U,S,V] = svd(A);
 % Set F_n to be the last column of V
-F_n = reshape(VT(:,end),[3,3])';
-[U,S,VT] = svd(F_n);
+F_n = reshape(V(:,end),[3,3])';
+[U,S,V] = svd(F_n);
 % Enforcing Singularity
 S(9)=0;
-F_n = U*S*VT';
+F_n = U*S*V';
 % Denormalisation
 F = T_nr'*F_n*T_nl;
 % Essential Matrix
 E = K'*F*K;
 % Estimate R&T from E
-[UE,SE,VE]=svd(E);
+[U,S,V] = svd(E);
+R1=U*W*V';
+t1=U(:,3);
+R2=U*W'*V';
+t2=T1*-1;
+
+
 
 return;
 
