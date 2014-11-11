@@ -14,7 +14,8 @@ addpath(genpath('variables'));
 % end
 
 %% Intrinsic camera parameters for Kinect camera
-cameraModel=[-525 0 320;0 -525 240;0 0 1]; 
+K=[-525 0 320;0 -525 240;0 0 1];
+W=[0 -1 0;1 0 0; 0 0 1];
 
 %% Using points given by proffesor for testing (12)
 x_l = [
@@ -84,15 +85,25 @@ for i=1:length(x_l)
 end
 
 % Compute SVD of A
-[U,S,VT] = svd(A);
-% Set f to be the last column of V
-F_n = reshape(VT(:,end),[3,3])';
-[U,S,VT] = svd(F_n);
+[U,S,V] = svd(A);
+% Set F_n to be the last column of V
+F_n = reshape(V(:,end),[3,3])';
+[U,S,V] = svd(F_n);
 % Enforcing Singularity
 S(9)=0;
-F_n = U*S*VT';
+F_n = U*S*V';
 % Denormalisation
 F = T_nr'*F_n*T_nl;
+% Essential Matrix
+E = K'*F*K;
+% Estimate R&T from E
+[U,S,V] = svd(E);
+R1=U*W*V';
+T1=U(:,3);
+R2=U*W'*V';
+T2=T1*-1;
+
+
 
 return;
 
