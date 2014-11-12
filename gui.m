@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 11-Nov-2014 10:27:56
+% Last Modified by GUIDE v2.5 11-Nov-2014 20:25:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -77,6 +77,9 @@ function gui_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.all_images = images;
     handles.left_image_idx = 1;
     handles.right_image_idx= 8;
+
+    handles.added_count = 0; %How many points have been added total
+    handles.last_added = 'left'; %Indicates the last figure where a point was added
 
     handles.left_image = handles.all_images(:,:,1:3,handles.left_image_idx);
     handles.right_Image = handles.all_images(:,:,1:3,handles.right_image_idx);;
@@ -137,7 +140,10 @@ function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
             handles.tot_left = handles.tot_left + 1;
 
             handles.left_points(handles.tot_left,1)  = x;
-            handles.left_points(handles.tot_left,2)  = y;
+            handles.left_points(handles.tot_left,2)  = handles.img_heigth - y;
+
+            handles.added_count = handles.added_count + 1;
+            handles.last_added(handles.added_count) = 'l';
         else
             x = ( (pos(1)-handles.figure_width)/handles.figure_width)*handles.img_width;
             y = handles.img_heigth-...
@@ -150,7 +156,10 @@ function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
             handles.tot_right = handles.tot_right + 1;
 
             handles.right_points(handles.tot_right,1)  = x;
-            handles.right_points(handles.tot_right,2)  = y;
+            handles.right_points(handles.tot_right,2)  = handles.img_heigth - y;
+
+            handles.added_count = handles.added_count + 1;
+            handles.last_added(handles.added_count) = 'r';
         end
         guidata(hObject, handles);
     end
@@ -169,12 +178,12 @@ function pushbutton3_Callback(hObject, eventdata, handles)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
     if( handles.tot_left == handles.tot_right )
-        if(handles.tot_left < 8)
+        if(handles.tot_left < 1)
             disp('You need at least 8 points in each image');
             disp(strcat('You currently have selected only: ', num2str(handles.tot_left)));
         else
-            x_l = handles.left_points;
-            x_r = handles.right_points;
+            x_l = handles.left_points
+            x_r = handles.right_points
             save('Points.mat','x_l','x_r');
         end
     else
@@ -182,4 +191,69 @@ function pushbutton3_Callback(hObject, eventdata, handles)
         disp('Plase choose the same number of points to continue');
         disp(strcat('Number of left pts: ', num2str(handles.tot_left)));
         disp(strcat('Number of right pts: ', num2str(handles.tot_right)));
+    end
+
+
+% --- Executes on button press in reset.
+function reset_Callback(hObject, eventdata, handles)
+% hObject    handle to reset (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    handles.tot_right = 0;
+    handles.tot_left = 0;
+    handles.right_points = [];
+    handles.left_points = [];
+
+    axes(handles.axes1);
+    hold off;
+    imshow(uint8(handles.left_image));
+    axes(handles.axes2);
+    hold off;
+    imshow(uint8(handles.right_Image));
+
+    handles.added_count = 0; %How many points have been added total
+    guidata(hObject, handles);
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    if(handles.added_count > 0)
+        if(handles.last_added(handles.added_count) == 'l')
+            handles.tot_left = max(0,handles.tot_left - 1);
+            handles.left_points = handles.left_points(1:handles.tot_left,:);
+
+            axes(handles.axes1);
+            hold off;
+            imshow(uint8(handles.left_image));
+
+            axes(handles.axes1);
+            hold on
+            for i=1:handles.tot_left
+                x = handles.left_points(i,1);
+                y = handles.left_points(i,2);
+                plot(x,y, strcat( handles.colors(1+mod(i-1, length(handles.colors))), '*'));
+            end
+
+        else
+            handles.tot_right = max(0,handles.tot_right - 1);
+            handles.right_points = handles.right_points(1:handles.tot_right,:);
+
+            axes(handles.axes2);
+            hold off;
+            imshow(uint8(handles.right_Image));
+
+            axes(handles.axes2);
+            hold on
+            for i=1:handles.tot_right
+                x = handles.right_points(i,1);
+                y = handles.right_points(i,2);
+                plot(x,y, strcat( handles.colors(1+mod(i-1, length(handles.colors))), '*'));
+            end
+        end
+        handles.added_count = handles.added_count - 1;
+        guidata(hObject, handles);
     end

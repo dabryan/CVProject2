@@ -17,6 +17,49 @@
 \begin{document}
 \maketitle
 
+\subsection{Matlab interface}
+We created a useful interface to define the corresponding points between two images.
+Figure \ref{fig:demo} shows a screenshot of this interface. The user needs to select
+corresponding points between images and it doesn't have to be in order (one point in one
+image and the next point in the following image). The interface also provides a button to
+reset all the points as well as to remove the last added point. These two buttons are
+very handy when selecting points. Once all the desired buttons have been selected the 
+resulting points are saved in at matlab file that can be stored for later compuatation
+using the 8-point algorithm. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[totalheight=.38\textheight]{./images/Example.jpg}
+    \caption{Matlab interface to select corresponding points between two images.
+    Example of selecting 9 points using the Matlab interface.}
+    \label{fig:demo}
+\end{figure}
+
+Each corresponding point is displayed with the same color, 
+this makes it easy to see wich points correspond in both of the images.
+The coordinates obtained from the selection of points displayed at figure \ref{fig:demo} 
+are displayed in figure \ref{fig:pts}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[totalheight=.38\textheight]{./images/pts.png}
+    \caption{Obtained coordinates from the selected in figure \ref{fig:demo}.}
+    \label{fig:pts}
+\end{figure}
+
+In our results we use the example provided by the professor to compare the results. \\
+
+In order to test the correct correspondence of the points obtained by the Matlab interface
+we selected 4-points close to the corners of the two figures as displayed in figure \ref{fig:check} 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[totalheight=.38\textheight]{./images/Check.jpg}
+    \caption{}
+    \label{fig:check}
+\end{figure}
+
+\subsection{Eight-point algorithm}
 \begin{itemize}
     \item Normalize image points
         \begin{itemize}
