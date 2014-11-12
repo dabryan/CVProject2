@@ -3,6 +3,7 @@ clear all;
 close all;
 addpath(genpath('externalLib'));
 addpath(genpath('variables'));
+format short;
 
 %% Intrinsic camera parameters for Kinect camera
 K=[-525 0 320;0 -525 240;0 0 1];
@@ -11,7 +12,7 @@ W=[0 -1 0;1 0 0; 0 0 1];
 %load('Points.mat','x_l','x_r');
 
 %% Using points given by proffesor for testing (12)
-x_l = [
+x_l = [         
     434.00 360
     468.00 542
     275.00 393
@@ -22,11 +23,11 @@ x_l = [
     261.00 628
     631.00 541
     655.00 622
-    787.00 549
+    787.00 540
     650.00 443];
 
 x_r = [
-    428 352
+    428 354
     447 545
     255 389
     265 545
@@ -60,35 +61,41 @@ T_sr = [sqrt(2)/RMS_r   0               0
         0               0               1];
 
 % Tnorm
-T_nl = T_sl*T_tl;
-T_nr = T_sr*T_tr;
+T_nl = T_sl*T_tl
+T_nr = T_sr*T_tr
 
 % Adding extra column to make the multiplication
 x_l(:,3) = 1;
 x_r(:,3) = 1;
 
 % Normalizing points 
-uvl = T_nl*x_l';
-uvr = T_nr*x_r';
+display('Points on both cameras after normalization');
+% Changing to double precission
+uvl = T_nl*x_l'
+uvr = T_nr*x_r'
 
 % Build matrix A
 A = zeros(length(x_l),9); 
 for i=1:length(x_l)
-    A(i,:) = [uvl(1,i)*uvr(1,i) uvl(1,i)*uvr(2,i) uvl(1,i) uvl(2)*uvr(1) uvl(2,i)*uvr(2,i) uvl(2,i) uvr(1,i) uvr(2,i) 1];
+    A(i,:) = [uvl(1,i)*uvr(1,i) uvl(1,i)*uvr(2,i) uvl(1,i) uvl(2,i)*uvr(1,i) uvl(2,i)*uvr(2,i) uvl(2,i) uvr(1,i) uvr(2,i) 1];
 end
+A
 
 % Compute SVD of A
 [U,S,V] = svd(A);
 % Set F_n to be the last column of V
-F_n = reshape(V(:,end),[3,3])';
+display('F normalized');
+F_n = reshape(V(:,end),[3,3])'
 [U,S,V] = svd(F_n);
 % Enforcing Singularity
 S(9)=0;
 F_n = U*S*V';
 % Denormalisation
-F = T_nr'*F_n*T_nl;
+display('F (fundamental matrix) denormalized');
+F = T_nr'*F_n*T_nl
 % Essential Matrix
-E = K'*F*K;
+display('Essential matrix E');
+E = K'*F*K
 % Estimate R&T from E
 [U,S,V] = svd(E);
 R1=U*W*V';
@@ -97,6 +104,7 @@ T_nl=K/x_l;
 R2=U*W'*V';
 T2=T1*-1;
 T_nr=K/x_r;
+
 % Four possible solutions for R1:2,T1:2
 Z_avg=0;
 for i=1:4
@@ -162,8 +170,3 @@ hold on
 depth=montage(uint8(images(:,:,5,1:9)));
 set(depth, 'AlphaData', .5 );
 colormap jet
-
-
-
-
-
