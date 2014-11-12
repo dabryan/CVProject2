@@ -4,20 +4,11 @@ close all;
 addpath(genpath('externalLib'));
 addpath(genpath('variables'));
 
-
-
-% % Running in parallel, check if the pool of threads is already open
-% if matlabpool('size') == 0 
-%     infoLocal = parcluster('local');
-%     maxWorkers = infoLocal.NumWorkers;
-%     matlabpool('open',maxWorkers);
-% end
-
 %% Intrinsic camera parameters for Kinect camera
 K=[-525 0 320;0 -525 240;0 0 1];
 W=[0 -1 0;1 0 0; 0 0 1];
 
-load('Points.mat','x_l','x_r');
+%load('Points.mat','x_l','x_r');
 
 %% Using points given by proffesor for testing (12)
 x_l = [
@@ -102,10 +93,57 @@ E = K'*F*K;
 [U,S,V] = svd(E);
 R1=U*W*V';
 T1=U(:,3);
+T_nl=K/x_l;
 R2=U*W'*V';
 T2=T1*-1;
-
-
+T_nr=K/x_r;
+% Four possible solutions for R1:2,T1:2
+Z_avg=0;
+for i=1:4
+    switch i
+        case 1
+            R=R1;
+            T=T1;
+        case 2
+            R=R1;
+            T=T2;
+        case 3
+            R=R2;
+            T=T1;
+        case 4
+            R=R2;
+            T=T2;
+    end
+    for j=1:length(x_l)
+        x1=T_nl(1,j);
+        y1=T_nl(2,j);
+        x2=T_nr(1,j);
+        y2=T_nr(2,j);
+        A = [
+            -1 0 x1 0
+            0 -1 y1 0
+            -R(1,1)+x2*R(3,1) -R(1,2)+x2*R(3,2) -R(1,3)+x2*R(3,3)  -T(1)+x2*T(3)
+            -R(2,1)+y2*R(3,1) -R(2,2)+y2*R(3,2) -R(2,3)+y2*R(3,3)  -T(2)+y2*T(3)];
+        [U,S,V] = svd(A);
+        % X,Y,Z from last column of V 
+        P1(:,j)=V(1:3,end);
+        % divided by W
+        P1(:,j)=P1(:,j)/V(4,end);
+        P2(:,j)=R*P1(:,j)+T;
+    end
+    % only positive Z
+    if mean(P1(3,:))+mean(P2(3,:))>Z_avg
+        Z_avg=mean(P1(3,:))+mean(P2(3,:));
+        RE=R;
+        TE=T;
+        P1E=P1;
+        P2E=P2;
+    end
+end
+RE
+TE
+P1E
+P2E
 
 return;
 
