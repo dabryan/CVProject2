@@ -85,7 +85,8 @@ A
 [U,S,V] = svd(A);
 % Set F_n to be the last column of V
 display('F normalized');
-F_n = reshape(V(:,end),[3,3])'
+F_n = reshape(V(:,end),[3,3])';
+F_n = F_n'
 [U,S,V] = svd(F_n);
 % Enforcing Singularity
 S(9)=0;
@@ -100,9 +101,9 @@ E = K'*F*K
 [U,S,V] = svd(E);
 R1=U*W*V';
 T1=U(:,3);
-T_nl=K/x_l;
 R2=U*W'*V';
 T2=T1*-1;
+T_nl=K/x_l;
 T_nr=K/x_r;
 
 % Four possible solutions for R1:2,T1:2

@@ -121,8 +121,22 @@ follows the following algorithm:
                     \end{equation}
                 \item T can be $u_3$ or $-u_3$.
             \end{itemize}
-        \item {Choose proper solution}. Finally we need to choose from the four
-            possible solutions the one twhere 
+        \item \textbf{Choose proper solution}. Finally we need to choose from the four
+            possible solutions the correct one. 
+            \begin{itemize}
+                \item For each case build matrix A
+                    \begin{equation}
+                        A = \left [ 
+                            \begin{array}[]{cccc}
+                                -1 & 0 & x_1 & 0 \\
+                                0 & -1 & y_1 & 0 \\
+                                -R_{11} + x_2 R_{31} & -R_{12} + x_2 R_{32} & -R_{13} + x_2 R_{33} & -T_1 + x_2T_3 \\
+                                -R_{21} + y_2 R_{31} & -R_{22} + y_2 R_{32} & -R_{23} + y_2 R_{33} & -T_2 + y_2T_3 
+                            \end{array}
+                            \right ] 
+                    \end{equation}
+                \item Compute SVD of A and take last column of V to be the best solution.
+            \end{itemize}
     \end{itemize}
 
     \section{Interface to define corresponding points.}
