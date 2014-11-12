@@ -17,7 +17,7 @@
 \begin{document}
 \maketitle
 
-\subsection{Matlab interface}
+\section{Matlab interface}
 We created a useful interface to define the corresponding points between two images.
 Figure \ref{fig:demo} shows a screenshot of this interface. The user needs to select
 corresponding points between images and it doesn't have to be in order (one point in one
@@ -42,24 +42,28 @@ are displayed in figure \ref{fig:pts}.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[totalheight=.38\textheight]{./images/pts.png}
+    \includegraphics[totalheight=.24\textheight]{./images/ExamplePts.png}
     \caption{Obtained coordinates from the selected in figure \ref{fig:demo}.}
     \label{fig:pts}
 \end{figure}
 
 In our results we use the example provided by the professor to compare the results. \\
 
-In order to test the correct correspondence of the points obtained by the Matlab interface
-we selected 4-points close to the corners of the two figures as displayed in figure \ref{fig:check} 
-
+In order to test the correct coordinates of the points obtained by the Matlab interface
+we selected 4-points close to the corners of the two figures as displayed in figure \ref{fig:check}. 
+The points start in the upper right corner and go clockwise until the upper left corner. 
+The values obtained correspond very closely with the dimensions of the images but with the
+origin in the lower left corner. The values obtained are also displayed in figure \ref{fig:check}.
 \begin{figure}[h]
     \centering
-    \includegraphics[totalheight=.38\textheight]{./images/Check.jpg}
-    \caption{}
+    \includegraphics[totalheight=.20\textheight]{./images/Test.jpg}
+    \vspace{1px}
+    \includegraphics[totalheight=.18\textheight]{./images/TestPts.png}
+    \caption{Corners used to test the proper coordinates of the Matlab interface.}
     \label{fig:check}
 \end{figure}
 
-\subsection{Eight-point algorithm}
+\section{Eight-point algorithm}
 \begin{itemize}
     \item Normalize image points
         \begin{itemize}
